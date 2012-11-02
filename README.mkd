@@ -3,3 +3,9 @@ wiki.Phong
 
 @tdfischer wouldn't release the sourcecode for the Phong which sends out
 meeting reminders to the @synhak hackerspace. So I made one myself!
+
+He does meeting pages based on these facts:
+
+* Meetings are 2nd and 4th Thursday of every month
+* Proposals can be proposed up until a week before the meeting
+* Any proposals done in that week before the meeting carry over to the next
