@@ -17,7 +17,9 @@ if next_meeting != Date.today + 1
 end
 
 @config = get_config
-send_reminder_mail_for wiki_page, @config['mailer']
+# FIXME: DRY Method
+url = "#{@config['wiki']['wiki']['url']}wiki/HYH_Meeting_#{next_meeting.to_s}"
+send_reminder_mail_for url, @config['mailer']
 
 #testing
 #print send_reminder_mail_for "http://wiki.heatsynclabs.org/wiki/HYH_Meeting_2012-11-08", @config['mailer']
