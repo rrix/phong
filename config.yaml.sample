@@ -1,4 +1,4 @@
-wiki: 
+wiki:
   imap:
     username: 'phong@heatsynclabs.org'
     password: 'changeme'
@@ -19,14 +19,36 @@ mailer:
     username: 'phong@heatsynclabs.org'
     password: 'changeme'
     server:   'smtp.gmail.com'
-    port:     465
+    port:     587
     ssl:      true
-  mailing_list: 'heatsynclabs@googlegroups.com'
-  template: |
+  mailing_list: 'heatsynclabs@groups.google.com'
+  reminder_template: |
     $GREETING$
 
     Just a friendly reminder that there is a meeting tomorrow night at 7pm
     sharp! I've generated an agenda for the meeting online at $URL$
 
     Hack on!
+    Phong
+  agenda_template: |
+    $GREETING$
+
+    Hope you folks got your proposals in! Looks like next week we'll be voting
+    on the following proposals: $PROPOSALS$
+
+    I've stubbed an agenda over at $URL$, take a look and make sure I didn't
+    mess anything up; I'm only a lowly bot, after all.
+
+    See you all soon!
+
+    Th-th-th-th-th-that's all folks!
+    Phong
+  minutes_template: |
+    $GREETING$
+
+    We had a meeting yesterday! Doug probably cleaned the toilet! Things were
+    presumably voted on! Check out the results of the meeting online here: 
+    $URL$
+
+    Friday, friday, gotta get down!
     Phong
