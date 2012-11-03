@@ -15,16 +15,14 @@ Installation
 
 It's recommended to put this under its own user
 
-``
-# adduser phong
-# su phong
-$ git clone git://github.com/rrix/phong
-$ cd phong
-$ (crontab -l ; cat phong.cron) | crontab -
-$ mv config.yaml{.sample,}
-$ vim config.yaml
-  # edit your config as appropriate
-``
+    # adduser phong
+    # su phong
+    $ git clone git://github.com/rrix/phong
+    $ cd phong
+    $ (crontab -l ; cat phong.cron) | crontab -
+    $ mv config.yaml{.sample,}
+    $ vim config.yaml
+      # edit your config as appropriate
 
 He'll run weekly because cron, but there is logic in the ruby to only send
 meeting notifications before the actual meeting dates. Same goes for
