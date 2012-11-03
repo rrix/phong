@@ -1,15 +1,32 @@
-imap:
-  username: 'phong@heatsynclabs.org'
-  password: 'changeme'
-  mailbox:  'inbox'
-  server:   'imap.gmail.com'
-  port:     993
-  ssl:      true
-mailing_list: 'heatsynclabs@googlegroups.com'
-past_proposals:
-- 'Test'
-wiki:
-  url: "http://wiki.heatsynclabs.org/w/api.php"
-  template: "HYH Meeting Template"
-  username: "Phong"
-  password: "changeme"
+wiki: 
+  imap:
+    username: 'phong@heatsynclabs.org'
+    password: 'changeme'
+    mailbox:  'inbox'
+    server:   'imap.gmail.com'
+    port:     993
+    ssl:      true
+  mailing_list: 'heatsynclabs@googlegroups.com'
+  past_proposals:
+  - 'Test'
+  wiki:
+    url: "http://wiki.heatsynclabs.org/"
+    template: "HYH Meeting Template"
+    username: "Phong"
+    password: "changeme"
+mailer:
+  smtp:
+    username: 'phong@heatsynclabs.org'
+    password: 'changeme'
+    server:   'smtp.gmail.com'
+    port:     465
+    ssl:      true
+  mailing_list: 'heatsynclabs@googlegroups.com'
+  template: |
+    $GREETING$
+
+    Just a friendly reminder that there is a meeting tomorrow night at 7pm
+    sharp! I've generated an agenda for the meeting online at $URL$
+
+    Hack on!
+    Phong
