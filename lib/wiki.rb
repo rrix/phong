@@ -1,17 +1,11 @@
-#!/bin/env ruby
 # vim: set foldmethod=marker foldlevel=0:
 
-require 'yaml'
 require 'chronic'
 require 'net/imap'
 require 'media_wiki'
 require 'pry'
 
 #{{{1 Magick
-def get_config
-  YAML::load File.open('config.yaml')
-end
-
 def show_wait_spinner(fps=5)
   chars = %w[ | / - \\ ]
   delay = 1.0/fps
@@ -34,9 +28,9 @@ end
 def messages_since since = last_meeting - 7, before = next_meeting - 7
   messages = []
 
-  imap = Net::IMAP.new( @config['imap']['server'], @config['imap']['port'], @config['imap']['ssl'])
-  imap.login @config['imap']['username'], @config['imap']['password']
-  imap.examine @config['imap']['mailbox']
+  imap = Net::IMAP.new( @wiki_config['imap']['server'], @wiki_config['imap']['port'], @wiki_config['imap']['ssl'])
+  imap.login @wiki_config['imap']['username'], @wiki_config['imap']['password']
+  imap.examine @wiki_config['imap']['mailbox']
   imap.search(["SINCE", since.strftime("%e-%b-%Y"),
                "BEFORE", before.strftime("%e-%b-%Y"),
                "SUBJECT", "PROPOSAL\: "]).each do |message_id|
@@ -63,12 +57,12 @@ def find_proposals_in messages
         unless envelope.subject =~ /Re:/i
           envelope.subject = clean_subject_of( envelope )
 
-          next if @config['past_proposals'].index(envelope.subject) != nil
+          next if @wiki_config['past_proposals'].index(envelope.subject) != nil
           next if DateTime.parse(envelope.date) < last_meeting - 7
           next if DateTime.parse(envelope.date) > next_meeting - 7
 
           proposals << message
-          @config['past_proposals'] << envelope.subject
+          @wiki_config['past_proposals'] << envelope.subject
         end
       end
     end
@@ -90,13 +84,13 @@ end
 def message_to_group envelope
   if envelope.cc
     envelope.cc.each do |rcpt|
-      return true if "#{rcpt.mailbox}@#{rcpt.host}" == @config['mailing_list']
+      return true if "#{rcpt.mailbox}@#{rcpt.host}" == @wiki_config['mailing_list']
     end
   end
 
   if envelope.to
     envelope.to.each do |rcpt|
-      return true if "#{rcpt.mailbox}@#{rcpt.host}" == @config['mailing_list']
+      return true if "#{rcpt.mailbox}@#{rcpt.host}" == @wiki_config['mailing_list']
     end
   end
 
@@ -105,7 +99,7 @@ end
 # }}}1
 
 #{{{1 Find meetings logic
-#last_meeting = Date.parse(@config['last_meeting'])
+#last_meeting = Date.parse(@wiki_config['last_meeting'])
 def first_thursday month_date
   first_thursday = Date.new(month_date.year, month_date.month, 1)
 
@@ -172,12 +166,11 @@ def get_first_part body
 
   valid_section = ary.join("\r\n\r\n")
 
-  binding.pry
   return valid_section
 end
 
 def generate_wiki_page_from config, proposals
-  mw = MediaWiki::Gateway.new config['url'], {bot: true}
+  mw = MediaWiki::Gateway.new "#{config['url']}/w/api.php", {bot: true}
   mw.login(config['username'], config['password'])
 
   template_page = mw.get config['template']
@@ -205,44 +198,53 @@ def generate_wiki_page_from config, proposals
 ==== Discussion ====
 <!-- note any discussion here, preferably with attribution of discussers -->
 
-* '''RESULT: #FIXME#''' <!-- recrod final verdict and tally of votes -->
+* '''RESULT: #FIXME#''' <!-- record final verdict and tally of votes -->
 
 "
 
     section_text += proposal_text
   end
 
-  filled_template.gsub(/\$LAST_MEETING\$/, "HYH Meeting #{last_meeting.strftime("%F")}"
-
   filled_template = [split[0], section_text, split[1]].join("\n")
+  filled_template.gsub(/\$LAST_MEETING\$/, "HYH Meeting #{last_meeting.strftime("%F")}")
 
-  new_page = mw.create next_meeting.strftime("HYH Meeting %F"), filled_template, summary: "Set up meeting page"
+  page_name = next_meeting.strftime("HYH Meeting %F")
+
+  new_page = mw.create page_name, filled_template, summary: "Set up meeting page"
+
+  return "#{config['url']}wiki/#{MediaWiki.wiki_to_uri page_name}"
 end
 #1}}}
 
-@config = get_config
-@proposals = []
+#{{{1 Runner
+def premeeting_wiki_generation config
+  @wiki_config = config
+  @proposals = []
 
-print "*** Fetching proposals since #{ (last_meeting - 7).strftime("%F") } to #{ (next_meeting - 7).strftime("%F")} ... "
-#FIXME: messages a week before this meeting aren't valid
-@proposals = show_wait_spinner{
-  find_proposals_in messages_since( last_meeting - 7, Date.today )
-}
-puts "Done!"
+  print "*** Fetching proposals since #{ (last_meeting - 7).strftime("%F") } to #{ (next_meeting - 7).strftime("%F")} ... "
+  @proposals = show_wait_spinner{
+    find_proposals_in messages_since( last_meeting - 7, next_meeting - 7 )
+  }
+  puts "Done!"
 
-print "*** Generating wiki page for #{next_meeting.strftime("%F")} ... "
-#begin
-#show_wait_spinner{
-  generate_wiki_page_from @config['wiki'], @proposals
-#}
-#rescue
-#  puts "Could not save page!"
-#end
-puts "Done!"
+  print "*** Generating wiki page for #{next_meeting.strftime("%F")} ... "
+  begin
+    show_wait_spinner{
+      @page_url = generate_wiki_page_from @wiki_config['wiki'], @proposals
+    }
+  rescue
+    puts "Could not save page!"
+    return nil
+  end
+  puts "Done! Page is at #{@page_url}"
 
-puts "===== Summary ====="
-print "This week we're voting on: "
-puts @proposals.map{|prop| prop['ENVELOPE'].subject} * ", "
-puts ""
-puts "'Phong, the wise one. It is an honor to finally meet you...'"
+  puts "===== Summary ====="
+  print "This week we're voting on: "
+  puts @proposals.map{|prop| prop['ENVELOPE'].subject} * ", "
+  puts ""
+  puts "'Phong, the wise one. It is an honor to finally meet you...'"
+
+  return @page_url
+end
+#}}}1
 
