@@ -1,4 +1,6 @@
-# I run every wednesday before the google group summary goes out! 
-0 19 * * 3 ~phong/premeeting.rb
-# I also run the morning after every meeting!
-0 8  * * 5 ~phong/postmeeting.rb
+# I run on Wednesdays so that I can check if there is a meeting the day after
+# and remind people
+0 19 * * 3 ~phong/wednesdays.rb
+# I run on Fridays so that I can send meeting minutes out and so that I can
+# tell people about the next vote's proposals.
+0 8  * * 5 ~phong/fridays.rb
