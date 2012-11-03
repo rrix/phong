@@ -20,6 +20,25 @@ def show_wait_spinner(fps=5)
 end
 #1}}}
 
+def send_minutes_for wiki_url
+  print "*** Sending minutes mail ... "
+  show_wait_spinner{
+    @mailer_config = config
+
+    template = config['minutes_template']
+
+    subjects = stuffed_envelopes.map{|prop| prop['ENVELOPE'].subject} * ", "
+
+    templated =  template.gsub(/\$URL\$/i, wiki_url)
+    templated = templated.gsub(/\$GREETING\$/i, greeting)
+
+    header = generate_minutes_header
+    full_mail = header + templated
+
+    send_message full_mail
+  }
+end
+
 def send_agenda_for url, stuffed_envelopes, config
   print "*** Sending agenda mail ... "
   show_wait_spinner{
@@ -87,6 +106,12 @@ end
 
 def generate_reminder_header
   header = generate_base_header + "Subject: Hack Your Hackerspace Meeting Tomorrow!
+
+  "
+end
+
+def generate_minutes_header
+  header = generate_base_header + "Subject: Meeting Minutes for Yesterday's HYH Meeting
 
   "
 end
