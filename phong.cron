@@ -1,0 +1,4 @@
+# I run every wednesday before the google group summary goes out! 
+0 19 * * 3 ~phong/premeeting.rb
+# I also run the morning after every meeting!
+0 8  * * 5 ~phong/postmeeting.rb
