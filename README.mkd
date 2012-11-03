@@ -16,7 +16,7 @@ Installation
 It's recommended to put this under its own user
 
     # adduser phong
-    # su phong
+    # su - phong
     $ git clone git://github.com/rrix/phong
     $ cd phong
     $ (crontab -l ; cat phong.cron) | crontab -
