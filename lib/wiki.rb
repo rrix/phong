@@ -176,7 +176,7 @@ def generate_wiki_page_from config, proposals
   template_page = mw.get config['template']
   section_text = ""
 
-  template_page.gsub(/\$LAST_MEETING\$/, "HYH Meeting #{last_meeting.to_s}")
+  template_page = template_page.gsub(/\$LAST_MEETING\$/, "HYH Meeting #{last_meeting.to_s}")
 
   # Transform template_page
   split = template_page.split("$PROPOSALS$")
