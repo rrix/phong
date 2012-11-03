@@ -17,8 +17,6 @@ if next_meeting != Date.today + 1
 end
 
 @config = get_config
-wiki_page = premeeting_wiki_generation @config['wiki']
-
 send_reminder_mail_for wiki_page, @config['mailer']
 
 #testing
