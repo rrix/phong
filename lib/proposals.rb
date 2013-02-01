@@ -1,5 +1,6 @@
 # vim: set foldmethod=marker foldlevel=0:
 require 'net/imap'
+require 'pry'
  
 #{{{1 Magick
 def show_wait_spinner(fps=5)
@@ -21,15 +22,15 @@ end
 #1}}}
 
 #{{{1 Message fetching
-def messages_since since = last_meeting - 7, before = next_meeting - 7
+def messages_since since = last_meeting - 7, before = next_meeting - 6
+  @since = since
+  @before = before
   messages = []
 
   imap = Net::IMAP.new( @wiki_config['imap']['server'], @wiki_config['imap']['port'], @wiki_config['imap']['ssl'])
   imap.login @wiki_config['imap']['username'], @wiki_config['imap']['password']
   imap.examine @wiki_config['imap']['mailbox']
-  imap.search(["SINCE", since.strftime("%e-%b-%Y"),
-               "BEFORE", before.strftime("%e-%b-%Y"),
-               "SUBJECT", "PROPOSAL\: "]).each do |message_id|
+  imap.search(["SUBJECT", "PROPOSAL\: "]).each do |message_id|
     data = imap.fetch(message_id, ["ENVELOPE", "BODY[]"])
     message = {}
     message['ENVELOPE'] = data[0].attr["ENVELOPE"]
@@ -54,8 +55,8 @@ def find_proposals_in messages
           envelope.subject = clean_subject_of( envelope )
 
           next if @wiki_config['past_proposals'].index(envelope.subject) != nil
-          next if DateTime.parse(envelope.date) < last_meeting - 7
-          next if DateTime.parse(envelope.date) > next_meeting - 7
+          next if DateTime.parse(envelope.date) < @since
+          next if DateTime.parse(envelope.date) > @before
 
           proposals << message
           @wiki_config['past_proposals'] << envelope.subject
