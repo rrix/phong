@@ -106,7 +106,7 @@ def premeeting_wiki_generation config
 
   print "*** Fetching proposals since #{ (last_meeting - 7).strftime("%F") } to #{ (next_meeting - 7).strftime("%F")} ... "
   @proposals = show_wait_spinner{
-    find_proposals_in messages_since( last_meeting - 7, next_meeting - 7 )
+    find_proposals_in messages_since( last_meeting - 7, next_meeting - 6 )
   }
   puts "Done!"
 
